@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+<?import xerus.music.view.FolderViewer?>
+<?import xerus.ktutil.javafx.ui.LogTextArea?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="xerus.music.MusicPlayer"
+      maxHeight="Infinity" maxWidth="Infinity">
+    <MenuBar VBox.vgrow="NEVER">
+        <Menu text="Main">
+            <MenuItem onAction="#quit" text="Quit"/>
+        </Menu>
+        <Menu text="Library">
+            <MenuItem onAction="#selectLibraryFolder" text="Select Library"/>
+            <!--<CheckMenuItem id="enableRatings" text="Enable Ratings"/>-->
+        </Menu>
+        <Menu text="View">
+            <!--<CheckMenuItem id="enableRatingColors" text="Show Rating colors"/>-->
+            <MenuItem onAction="#selectLayout" text="Select Layout"/>
+            <MenuItem onAction="#selectCSS" text="Select Style"/>
+            <MenuItem onAction="#resetLayouts" text="Reset layout"/>
+            <MenuItem onAction="#aboutLayouts" text="About layouting"/>
+        </Menu>
+        <Menu text="Help">
+            <MenuItem onAction="#about" text="About"/>
+        </Menu>
+    </MenuBar>
+    <TabPane VBox.vgrow="ALWAYS">
+        <Tab text="Folders">
+            <VBox>
+                <FolderViewer/>
+                <TextField fx:id="searchField"/>
+            </VBox>
+        </Tab>
+        <Tab text="Log">
+            <VBox>
+                <ComboBox fx:id="loglevel"/>
+                <LogTextArea VBox.vgrow="ALWAYS" fx:id="log"/>
+            </VBox>
+        </Tab>
+    </TabPane>
+    <Label text="{curSong}" maxWidth="Infinity"/>
+    <HBox alignment="CENTER_LEFT">
+        <Label HBox.hgrow="SOMETIMES" text="Next: {nextSong}" maxWidth="Infinity"/>
+        <Button id="regenerate" onAction="#regenerateNextSong"/>
+    </HBox>
+    <HBox id="controls" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
+        <ToggleButton id="play-pause" fx:id="playPause" onAction="#playPause" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Button id="stop" onAction="#stop" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Button id="skip" onAction="#skip" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <ToggleButton id="repeat" onAction="#repeat" styleClass="button" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <!--<Button id="like" onAction="#like" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Button id="dislike" onAction="#dislike" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Button id="save" onAction="#saveRatings" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>-->
+    </HBox>
+    <Slider fx:id="volumeSlider"/>
+    <Slider fx:id="seekSlider"/>
+</VBox>

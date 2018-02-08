@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<?import xerus.music.view.FolderViewer?>
+<?import xerus.ktutil.javafx.ui.LogTextArea?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="xerus.music.MusicPlayer"
+      maxHeight="Infinity" maxWidth="Infinity">
+    <HBox alignment="CENTER_LEFT">
+        <Button HBox.hgrow="ALWAYS" minWidth="160" onAction="#skip" textField="Current: {curSong}" maxWidth="Infinity"/>
+        <Button HBox.hgrow="ALWAYS" minWidth="100" onAction="#regenerateNextSong" textField="Next: {nextSong}"
+                maxWidth="Infinity"/>
+    </HBox>
+    <Slider fx:id="seekSlider"/>
+    <HBox VBox.vgrow="ALWAYS">
+        <VBox id="controls" alignment="CENTER">
+            <Button id="play" onAction="#play"/>
+            <Button id="pause" onAction="#pause"/>
+            <Button id="stop" onAction="#stop"/>
+            <ToggleButton id="repeat" onAction="#repeat" styleClass="button"/>
+            <Button id="up" onAction="#increaseVolume"/>
+            <Button id="down" onAction="#decreaseVolume"/>
+        </VBox>
+        <TabPane VBox.vgrow="ALWAYS">
+            <Tab textField="Folders">
+                <VBox>
+                    <FolderViewer VBox.vgrow="ALWAYS"/>
+                    <TextField fx:id="searchField"/>
+                </VBox>
+            </Tab>
+            <Tab textField="Settings">
+                <VBox>
+                    <!--<ToggleButton id="enableRatingColors" textField="Show Rating colors"/>-->
+                    <Button onAction="#selectLibraryFolder" textField="Select Library"/>
+                    <Button onAction="#selectLayout" textField="Select Layout"/>
+                    <Button onAction="#selectCSS" textField="Select Style"/>
+                    <Button onAction="#aboutLayouts" textField="About layouting"/>
+                    <Button onAction="#resetLayouts" textField="Reset layout"/>
+                    <!--<ToggleButton id="enableRatings" textField="Enable Ratings"/>-->
+                    <Button onAction="#quit" textField="Quit"/>
+                    <Button onAction="#about" textField="About"/>
+                </VBox>
+            </Tab>
+            <Tab textField="Log">
+                <VBox>
+                    <ComboBox fx:id="loglevel"/>
+                    <LogTextArea VBox.vgrow="ALWAYS" fx:id="log"/>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </HBox>
+</VBox>

@@ -1,0 +1,152 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+import java.nio.file.Paths
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.javafxports:jfxmobile-plugin:1.3.8'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
+}
+apply plugin: 'kotlin'
+apply plugin: 'org.javafxports.jfxmobile'
+
+println("Java version: ${JavaVersion.current()}")
+mainClassName = 'xerus.music.Launcher'
+
+//gradle run -Dexec.args="FINE save" < nul
+run { args System.getProperty('exec.args', '').split() }
+
+// region dependencies
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions.jvmTarget = '1.8'
+}
+kotlin.experimental.coroutines "enable"
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url 'https://dl.bintray.com/ijabz/maven' }
+}
+
+
+dependencies {
+    compile 'xerus.util:javafx'
+    compile 'xerus.util:kotlin'
+
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlinVersion
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '0.+'
+
+    compile 'net.jthink:jaudiotagger:2.2.5'
+    compile group: 'com.gluonhq', name: 'charm-down-common', version: '2.0.1'
+}
+
+jfxmobile {
+    android {
+        manifest = 'src/android/AndroidManifest.xml'
+
+        compileSdkVersion = 26
+        minSdkVersion = 26
+    }
+    downConfig {
+        plugins 'storage', 'settings'
+    }
+}
+
+//endregion
+
+// ANDROID TASKS
+
+def ANDROID = 'Android'
+androidInstall.setGroup(ANDROID)
+
+def androidApk = android
+task apk {
+    group ANDROID
+    dependsOn(clean, androidApk)
+    androidApk.mustRunAfter clean
+}
+
+task pushApk(type: Exec) {
+    group ANDROID
+    commandLine "adb", "push", "D:/Data/GoogleDrive/Programmieren/MusicPlayer/MusicPlayer.apk", "storage/AE58-1072/Programmieren"
+    //commandLine "adb", "push", "build/javafxports/android/MusicPlayer.apk", "storage/AE58-1072/Programmieren"
+}
+
+task androidRun {
+    group ANDROID
+    doLast {
+        exec {
+            commandLine "adb", "logcat", "-c"
+        }
+        exec {
+            commandLine "adb",
+                    "shell", "monkey",
+                    "-p", "xerus.music", "1"
+        }
+        exec {
+            commandLine "adb", "logcat", "-s", "System.out"
+        }
+    }
+}
+androidRun.mustRunAfter androidInstall
+
+task android(dependsOn: [androidInstall, androidRun], overwrite: true, group: ANDROID)
+
+task androidUninstall(type: Exec) {
+    group ANDROID
+    commandLine "adb", "shell", "pm", "uninstall", "xerus.music"
+}
+
+// TASKS
+
+def MAIN = '!main'
+
+run.setGroup(MAIN)
+task jar(type: ShadowJar, overwrite: true) {
+    group = MAIN
+    classifier = null
+    description = "Assemble a Fat Jar"
+    for (set in [sourceSets.main, sourceSets.desktop])
+        from set.output
+    from compileDesktopJava.outputs
+    configurations = [project.configurations.desktopRuntime]
+}
+
+task release {
+    group MAIN
+    dependsOn(apk, jar)
+    doLast {
+        def releases = Paths.get("${releaseFolder}/MusicPlayer")
+        exec {
+            ignoreExitValue true
+            commandLine "robocopy", "/NJH", "/MIR", "src/layouts", releases.resolve("/layouts")
+        }
+        exec {
+            ignoreExitValue true
+            commandLine "robocopy", "/NJH", "build/libs", releases, "MusicPlayer.jar"
+        }
+        exec {
+            ignoreExitValue true
+            commandLine "robocopy", "/NJH", "build/javafxports/android", releases, "MusicPlayer.apk"
+        }
+    }
+}
+
+task bundleDependencies(type: Tar) {
+    group 'distribution'
+    baseName = 'dependencies'
+    for (config in configurations)
+        if (config.canBeResolved)
+            from config
+}

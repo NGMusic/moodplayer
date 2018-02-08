@@ -1,0 +1,26 @@
+
+#refresh {
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 16;
+    -fx-label-padding: 2 6;
+}
+
+.root {
+    -fx-font-size: 13px;
+}
+
+.text-area {
+    -fx-font-size: 10px;
+}
+
+.table-view .scroll-bar:horizontal .increment-arrow,
+.table-view .scroll-bar:horizontal .decrement-arrow,
+.table-view .scroll-bar:horizontal .increment-button,
+.table-view .scroll-bar:horizontal .decrement-button,
+.tree-view .scroll-bar:horizontal .increment-arrow,
+.tree-view .scroll-bar:horizontal .decrement-arrow,
+.tree-view .scroll-bar:horizontal .increment-button,
+.tree-view .scroll-bar:horizontal .decrement-button{
+    -fx-padding:0;
+}

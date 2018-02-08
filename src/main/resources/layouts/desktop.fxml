@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import xerus.music.view.*?>
+<?import xerus.ktutil.javafx.ui.LogTextArea?>
+
+<VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="xerus.music.MusicPlayer"
+      minWidth="360" prefHeight="600.0" prefWidth="500.0">
+    <MenuBar VBox.vgrow="NEVER">
+        <Menu text="Main">
+            <MenuItem onAction="#quit" text="Quit"/>
+        </Menu>
+        <Menu text="Library">
+            <MenuItem onAction="#selectLibraryFolder" text="Select Library"/>
+            <CheckMenuItem id="enableRatings" text="Enable Ratings"/>
+        </Menu>
+        <Menu text="View">
+            <CheckMenuItem id="enableRatingColors" text="Show Rating colors"/>
+            <MenuItem onAction="#selectLayout" text="Select Layout"/>
+            <MenuItem onAction="#selectCSS" text="Select Style"/>
+            <MenuItem onAction="#resetLayouts" text="Reset layout"/>
+            <MenuItem onAction="#aboutLayouts" text="About layouting"/>
+        </Menu>
+        <Menu text="Help">
+            <MenuItem onAction="#about" text="About"/>
+        </Menu>
+    </MenuBar>
+    <HBox id="controls" VBox.vgrow="NEVER" alignment="CENTER_LEFT">
+        <ToggleButton id="play-pause" fx:id="playPause" onAction="#playPause" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Button id="stop" onAction="#stop" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Button id="skip" onAction="#skip" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <ToggleButton id="repeat" onAction="#repeat" styleClass="button" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Button id="like" onAction="#like" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Button id="dislike" onAction="#dislike" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Button id="save" onAction="#saveRatings" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
+        <Slider fx:id="volumeSlider" HBox.hgrow="SOMETIMES" prefWidth="200.0"/>
+    </HBox>
+    <Slider VBox.vgrow="NEVER" fx:id="seekSlider"/>
+    <HBox alignment="CENTER_LEFT" spacing="5">
+        <padding>
+            <Insets top="2" right="5" bottom="2" left="5"/>
+        </padding>
+        <Label HBox.hgrow="SOMETIMES" text="Current: {curSong}" minWidth="170" maxWidth="Infinity"/>
+        <Label HBox.hgrow="SOMETIMES" text="Next: {nextSong}" minWidth="150" maxWidth="Infinity"/>
+        <Button id="refresh" onAction="#regenerateNextSong"/>
+    </HBox>
+    <TabPane VBox.vgrow="ALWAYS">
+        <Tab text="Folders">
+            <FolderViewer/>
+        </Tab>
+        <Tab text="Table">
+            <TableViewer>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+                <columns>
+                    <TableColumn text="Name">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="Name"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Artist">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="Artist"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Title">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="Title"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Genre">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="Genre"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                </columns>
+            </TableViewer>
+        </Tab>
+        <Tab text="Speed">
+            <BPMViewer/>
+        </Tab>
+        <Tab text="Log">
+            <VBox>
+                <ComboBox fx:id="loglevel"/>
+                <LogTextArea VBox.vgrow="ALWAYS" fx:id="log"/>
+            </VBox>
+        </Tab>
+    </TabPane>
+    <TextField fx:id="searchField"/>
+</VBox>
