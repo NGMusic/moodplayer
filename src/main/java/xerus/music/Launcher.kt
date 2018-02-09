@@ -25,7 +25,6 @@ import xerus.music.library.Library
 import xerus.music.library.brightness
 import xerus.music.player.Player
 import xerus.music.player.Player.curSong
-import xerus.music.player.Player.nextSong
 import xerus.music.view.SongViewer
 import java.io.File
 import java.net.URL
@@ -104,12 +103,11 @@ class Launcher : Application() {
 			}
 		
 		if (isDesktop)
-			curSong.addListener { _, _, nv ->
+			stage.titleProperty().dependOn(curSong) {
 				var title = WINDOWTITLE
-				if (nv != null) {
-				}
-				title += " - " + nv
-				stage.title = title
+				if (it != null)
+					title += " - " + it
+				title
 			}
 	}
 	
