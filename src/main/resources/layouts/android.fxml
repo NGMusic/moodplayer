@@ -40,9 +40,9 @@
             </VBox>
         </Tab>
     </TabPane>
-    <Label text="{curSong}" maxWidth="Infinity"/>
+    <Label text="%curSong%" maxWidth="Infinity"/>
     <HBox alignment="CENTER_LEFT">
-        <Label HBox.hgrow="SOMETIMES" text="Next: {nextSong}" maxWidth="Infinity"/>
+        <Label HBox.hgrow="SOMETIMES" text="Next: %nextSong%" maxWidth="Infinity"/>
         <Button id="regenerate" onAction="#regenerateNextSong"/>
     </HBox>
     <HBox id="controls" VBox.vgrow="NEVER" alignment="CENTER_LEFT">

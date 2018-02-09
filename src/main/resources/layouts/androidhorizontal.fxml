@@ -8,8 +8,8 @@
 <VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="xerus.music.MusicPlayer"
       maxHeight="Infinity" maxWidth="Infinity">
     <HBox alignment="CENTER_LEFT">
-        <Button HBox.hgrow="ALWAYS" minWidth="160" onAction="#skip" textField="Current: {curSong}" maxWidth="Infinity"/>
-        <Button HBox.hgrow="ALWAYS" minWidth="100" onAction="#regenerateNextSong" textField="Next: {nextSong}"
+        <Button HBox.hgrow="ALWAYS" minWidth="160" onAction="#skip" text="Current: %curSong%" maxWidth="Infinity"/>
+        <Button HBox.hgrow="ALWAYS" minWidth="100" onAction="#regenerateNextSong" text="Next: %nextSong%"
                 maxWidth="Infinity"/>
     </HBox>
     <Slider fx:id="seekSlider"/>
@@ -23,26 +23,26 @@
             <Button id="down" onAction="#decreaseVolume"/>
         </VBox>
         <TabPane VBox.vgrow="ALWAYS">
-            <Tab textField="Folders">
+            <Tab text="Folders">
                 <VBox>
                     <FolderViewer VBox.vgrow="ALWAYS"/>
                     <TextField fx:id="searchField"/>
                 </VBox>
             </Tab>
-            <Tab textField="Settings">
+            <Tab text="Settings">
                 <VBox>
-                    <!--<ToggleButton id="enableRatingColors" textField="Show Rating colors"/>-->
-                    <Button onAction="#selectLibraryFolder" textField="Select Library"/>
-                    <Button onAction="#selectLayout" textField="Select Layout"/>
-                    <Button onAction="#selectCSS" textField="Select Style"/>
-                    <Button onAction="#aboutLayouts" textField="About layouting"/>
-                    <Button onAction="#resetLayouts" textField="Reset layout"/>
-                    <!--<ToggleButton id="enableRatings" textField="Enable Ratings"/>-->
-                    <Button onAction="#quit" textField="Quit"/>
-                    <Button onAction="#about" textField="About"/>
+                    <!--<ToggleButton id="enableRatingColors" text="Show Rating colors"/>-->
+                    <Button onAction="#selectLibraryFolder" text="Select Library"/>
+                    <Button onAction="#selectLayout" text="Select Layout"/>
+                    <Button onAction="#selectCSS" text="Select Style"/>
+                    <Button onAction="#aboutLayouts" text="About layouting"/>
+                    <Button onAction="#resetLayouts" text="Reset layout"/>
+                    <!--<ToggleButton id="enableRatings" text="Enable Ratings"/>-->
+                    <Button onAction="#quit" text="Quit"/>
+                    <Button onAction="#about" text="About"/>
                 </VBox>
             </Tab>
-            <Tab textField="Log">
+            <Tab text="Log">
                 <VBox>
                     <ComboBox fx:id="loglevel"/>
                     <LogTextArea VBox.vgrow="ALWAYS" fx:id="log"/>

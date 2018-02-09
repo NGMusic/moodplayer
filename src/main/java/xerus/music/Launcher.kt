@@ -15,15 +15,12 @@ import javafx.scene.image.Image
 import javafx.scene.input.KeyEvent
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-import xerus.ktutil.XerusLogger
-import xerus.ktutil.getResource
-import xerus.ktutil.getStackTraceString
+import xerus.ktutil.*
 import xerus.ktutil.helpers.PseudoParser
 import xerus.ktutil.javafx.StylingTools
 import xerus.ktutil.javafx.applySkin
 import xerus.ktutil.javafx.checkJFX
-import xerus.ktutil.javafx.properties.bindSoft
-import xerus.ktutil.javafx.properties.dependOn
+import xerus.ktutil.javafx.properties.*
 import xerus.music.library.Library
 import xerus.music.library.brightness
 import xerus.music.player.Player
@@ -143,20 +140,32 @@ class Launcher : Application() {
 			}
 			
 			// Placeholders
-			val labels = StylingTools.find(root) { it is Labeled && it.text.contains("{") }
-			val parser = PseudoParser('{', '}')
-			labels.map { it as Labeled }.forEach {
-				try {
-					val m = parser.createMatcher(it.text, "curSong", "nextSong")
-					checkJFX {
-						
-						it.textProperty().bindSoft({
-							m.apply(curSong.get()?.toString() ?: "-", nextSong.get()?.toString() ?: "-")
-						}, curSong, nextSong)
-						it.tooltipProperty().dependOn(it.textProperty()) { Tooltip(it) }
+			@Suppress("unchecked_cast")
+			val labels = StylingTools.find(root) { it is Labeled && it.text.contains("%") } as Collection<Labeled>
+			if(labels.isNotEmpty()) {
+				val parser = PseudoParser('%')
+				val available = mapOf(Pair("curSong", Player.curSong), Pair("nextSong", Player.nextSong),
+						Pair("playedTime", Player.player.playedMillis.dependentObservable { formatTimeDynamic(it.toInt()) }),
+						Pair("totalTime", Player.player.totalMillis.dependentObservable { formatTimeDynamic(it.toInt(), Player.player.totalMillis.get()) }),
+						Pair("clock", TimedObservable(1000) { formattedTime() }))
+				for (label in labels) {
+					val placeholders = available.filter { label.text.contains(it.key) }
+					if (placeholders.isEmpty())
+						continue
+					try {
+						val matcher = parser.createMatcher(label.text,
+								*placeholders.mapTo(ArrayList(placeholders.size), { it.key }).toTypedArray())
+						val properties =
+								placeholders.mapTo(ArrayList(placeholders.size), { it.value }).toTypedArray()
+						checkJFX {
+							label.textProperty().bindSoft({
+								matcher.apply(*properties.map { it.value?.toString() ?: " - " }.toTypedArray())
+										.also { label.tooltip = Tooltip(it) }
+							}, *properties)
+						}
+					} catch (e: PseudoParser.ParserException) {
+						logger.warning(e.match + " is not a valid placeholder in Labeled " + label)
 					}
-				} catch (e: PseudoParser.ParserException) {
-					logger.warning(e.match + " is not a valid placeholder in Labeled " + it)
 				}
 			}
 			

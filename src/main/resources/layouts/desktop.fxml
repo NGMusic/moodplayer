@@ -43,8 +43,8 @@
         <padding>
             <Insets top="2" right="5" bottom="2" left="5"/>
         </padding>
-        <Label HBox.hgrow="SOMETIMES" text="Current: {curSong}" minWidth="170" maxWidth="Infinity"/>
-        <Label HBox.hgrow="SOMETIMES" text="Next: {nextSong}" minWidth="150" maxWidth="Infinity"/>
+        <Label HBox.hgrow="SOMETIMES" text="Current: %curSong%" minWidth="170" maxWidth="Infinity"/>
+        <Label HBox.hgrow="SOMETIMES" text="Next: %nextSong%" minWidth="150" maxWidth="Infinity"/>
         <Button id="refresh" onAction="#regenerateNextSong"/>
     </HBox>
     <TabPane VBox.vgrow="ALWAYS">
