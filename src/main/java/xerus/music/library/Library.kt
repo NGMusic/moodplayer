@@ -1,10 +1,12 @@
 package xerus.music.library
 
-import javafx.application.Platform
-import kotlinx.coroutines.experimental.Job
+import javafx.collections.FXCollections
+import javafx.collections.transformation.FilteredList
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import xerus.ktutil.helpers.SimpleRefresher
+import xerus.ktutil.helpers.WeakCollection
+import xerus.ktutil.javafx.onJFX
 import xerus.ktutil.toByteArray
 import xerus.ktutil.toInt
 import xerus.music.Launcher
@@ -13,15 +15,14 @@ import xerus.music.logger
 import xerus.music.player.SongHistory
 import xerus.music.view.SongViewer
 import java.io.*
-import java.lang.ref.WeakReference
 import java.util.*
 
 object Library {
 	
-	lateinit var path: File
+	lateinit var main: File
 		private set
 	val cache: File
-		get() = path.resolve(".lib").apply {
+		get() = main.resolve(".lib").apply {
 			if (!exists()) {
 				mkdirs()
 				if (System.getProperty("os.name").startsWith("Windows"))
@@ -29,7 +30,9 @@ object Library {
 			}
 		}
 	
-	val songs: Storage<Song> = Storage()
+	private val _songs: Storage<Song> = Storage()
+	val songsRaw = FXCollections.observableArrayList<Song>()
+	val songs = FilteredList<Song>(songsRaw)
 	
 	// region Initialization
 	
@@ -38,26 +41,27 @@ object Library {
 	fun initialize(mainLib: String, vararg viewers: SongViewer) {
 		inited = true
 		working = true
+		_songs.clear()
 		songs.clear()
-		path = File(mainLib)
+		main = File(mainLib)
 		ratingsPath = cache.resolve("ratings")
 		ratingsBackup = cache.resolve(ratingsPath.name + ".bak")
-		logger.config("Library initializing " + path)
+		logger.config("Library initializing " + mainLib)
 		
 		launch {
 			addViews(*viewers)
 			viewRefresher.refresh()
 			if (ratingsEnabled)
 				readRatings()
-			if (path.exists() && path.canRead())
-				addLibrary(path)
+			if (main.exists() && main.canRead())
+				addLibrary(main)
 			else
-				logger.warning("Library path $path not accessible")
+				logger.warning("Library path $main not accessible")
 		}
 	}
 	
 	private var working = true
-	private suspend fun addLibrary(path: File) {
+	suspend fun addLibrary(path: File) {
 		val queue = LinkedList<File>()
 		queue.add(path)
 		while (queue.isNotEmpty()) {
@@ -69,18 +73,21 @@ object Library {
 				addSong(file)
 			}
 		}
+		songsRaw.setAll(_songs)
 		working = false
 		if (ratingsEnabled)
 			SongHistory.createGenerator()
 		else
 			SongHistory.generateNextSong()
 		launch {
+			logger.finer("Writing song cache with ${_songs.size}")
 			cache.resolve("songs").outputStream().bufferedWriter().use { file ->
-				songs.forEach {
-					file.write(it.id.toString())
+				_songs.forEach {
+					file.write(it.id.toString() + " " + it.relativeTo(main))
 				}
 			}
 		}
+		logger.finer("Library $path added")
 	}
 	
 	private fun addSong(file: File) {
@@ -93,7 +100,7 @@ object Library {
 		}
 		val song = Song(file)
 		val id = song.id
-		songs.add(id, song)
+		_songs.add(id, song)
 		if (id > lastID)
 			lastID = id
 		song.initRatings(lines[id])
@@ -104,12 +111,12 @@ object Library {
 	
 	// region Views
 	
-	private val views = ArrayDeque<WeakReference<SongViewer>>()
+	private val views = WeakCollection<SongViewer>()
 	
 	fun addViews(vararg viewers: SongViewer) {
 		if (viewers.isEmpty())
 			return
-		viewers.mapTo(views) { WeakReference(it) }
+		views.addAll(viewers)
 		logger.fine("Added viewers: ${Arrays.toString(viewers)}")
 		if (!inited)
 			return
@@ -123,14 +130,13 @@ object Library {
 	private val viewRefresher = SimpleRefresher {
 		while (working)
 			delay(200)
-		System.gc()
-		views.removeIf { it.get() == null }
-		logger.config(String.format("Populating %s views with %s Songs", views.size, songs.trueSize))
-		views.forEach { populateView(it.get()) }
+		views.clean(2)
+		logger.config(String.format("Populating %s views with %s Songs", views.size, _songs.trueSize))
+		views.forEach { populateView(it) }
 	}
 	
-	private fun populateView(viewer: SongViewer?) {
-		Platform.runLater { viewer?.populate(songs) }
+	private fun populateView(viewer: SongViewer) {
+		onJFX { viewer.populate(_songs) }
 	}
 	
 	//endregion
@@ -145,7 +151,7 @@ object Library {
 				launch {
 					if (readRatings()) {
 						for (i in lines.indices) {
-							val s = songs[i]
+							val s = _songs[i]
 							s?.initRatings(lines[i])
 						}
 						lines.clear()
@@ -215,8 +221,8 @@ object Library {
 				FileOutputStream(ratingsPath).buffered().use { out ->
 					out.write(version)
 					out.write(lastID.toByteArray())
-					for (i in 0 until Math.max(songs.size, lines.size)) {
-						songs[i]?.run { lines[i] = serialiseRatings() }
+					for (i in 0 until Math.max(_songs.size, lines.size)) {
+						_songs[i]?.run { lines[i] = serialiseRatings() }
 						lines[i]?.let { out.write(it) }
 						out.write(lineSeparator)
 					}
@@ -234,6 +240,6 @@ object Library {
 	val nextID: Int
 		get() = ++lastID
 	
-	fun getSong(id: Int): Song? = songs[id]
+	fun getSong(id: Int): Song? = _songs[id]
 	
 }

@@ -77,7 +77,7 @@ class FolderViewer : TreeView<Any>(), SongViewer {
 		root.internalChildren.clear()
 		
 		val nodes = HashMap<String, FilterableTreeItem<String>>()
-		nodes.put(Library.path.name, root)
+		nodes.put(Library.main.name, root)
 		for (s in songs) {
 			val parent = s.parentFile.name
 			var node: FilterableTreeItem<String>? = nodes[parent]

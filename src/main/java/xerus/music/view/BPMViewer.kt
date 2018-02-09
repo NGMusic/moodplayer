@@ -6,8 +6,10 @@ import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import xerus.ktutil.javafx.*
 import xerus.ktutil.javafx.properties.bind
+import xerus.ktutil.javafx.properties.bindSoft
 import xerus.ktutil.javafx.properties.dependOn
 import xerus.ktutil.javafx.ui.FilteredTableView
+import xerus.music.library.Library
 import xerus.music.library.Song
 import java.util.function.Predicate
 import kotlin.math.roundToInt
@@ -17,6 +19,7 @@ class BPMViewer : VBox(5.0), SongViewer {
 	private val view = FilteredTableView<Song>()
 	private var filterField: TextInputControl? = null
 	
+	private val enable = ViewSettings.create("bpmEnable", true)
 	private val speed = ViewSettings.create("bpm", 60)
 	private val tolerance = ViewSettings.create("bpmTolerance", 0.1)
 	private val enableMultiples = ViewSettings.create("bpmEnableMultiples", true)
@@ -41,6 +44,15 @@ class BPMViewer : VBox(5.0), SongViewer {
 		view.addColumn("Name", { it.toString() })
 		view.addColumn("BPM", { it.bpm })
 		fill(view)
+		
+		enable.addListener { _, _, nv ->
+			if(nv) {
+				Library.songs.predicateProperty().bind(view.predicate)
+			} else {
+				Library.songs.predicateProperty().unbind()
+				Library.songs.predicate = null
+			}
+		}
 	}
 	
 	override fun populateView(songs: Iterable<Song>) {

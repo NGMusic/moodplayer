@@ -229,7 +229,7 @@ class MusicPlayer {
 
     @FXML
     fun selectLibraryFolder() {
-        selectLibrary(if (Library.inited) Library.path.toString() else Settings.LIBRARY.get())
+        selectLibrary(if (Library.inited) Library.main.toString() else Settings.LIBRARY.get())
     }
 
     @FXML
