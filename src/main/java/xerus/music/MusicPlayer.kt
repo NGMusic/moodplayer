@@ -1,16 +1,17 @@
 package xerus.music
 
 import javafx.application.Platform
-import javafx.beans.binding.Bindings
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.scene.control.*
 import xerus.ktutil.XerusLogger
 import xerus.ktutil.javafx.StylingTools
+import xerus.ktutil.javafx.onJFX
 import xerus.ktutil.javafx.properties.UnmodifiableObservableList
 import xerus.ktutil.javafx.properties.dependOn
-import xerus.ktutil.javafx.ui.LogTextArea
+import xerus.ktutil.javafx.ui.controls.LogTextArea
+import xerus.ktutil.javafx.ui.controls.SlideBar
 import xerus.music.library.Library
 import xerus.music.library.Song
 import xerus.music.player.Player
@@ -34,7 +35,7 @@ class MusicPlayer {
     @FXML
     var volumeSlider: Slider? = null
     @FXML
-    var seekSlider: Slider? = null
+    var seekSlider: SlideBar? = null
     @FXML
     var log: LogTextArea? = null
     @FXML
@@ -42,7 +43,7 @@ class MusicPlayer {
     @FXML
     var loglevel: ComboBox<String>? = null
 
-    private var repeatState: Boolean = false
+    var repeatState: Boolean = false
 
     init {
         musicPlayer = this
@@ -52,14 +53,14 @@ class MusicPlayer {
     fun initialize() {
         playPause?.run {
             isSelected = true
-            player.playing.addListener { _ -> playPause!!.isSelected = !isPlaying }
+            player.playing.addListener { _ -> isSelected = !isPlaying }
         }
         volumeSlider?.run {
             max = 1.0
             value = volumeCur.get().toDouble()
-            Bindings.bindBidirectional(volumeCur, volumeSlider!!.valueProperty())
+            valueProperty().bind(volumeCur)
         }
-        seekSlider?.run {
+        seekSlider?.slider?.run {
             isDisable = true
             disableProperty().dependOn(player.totalMillis, {
                 max = it.toDouble()
@@ -82,54 +83,6 @@ class MusicPlayer {
                     player.seek(new.toInt())
             })
         }
-        /*if (seekSlider != null) {
-            seekSlider!!.isDisable = true
-
-
-            addListener {
-                seekSlider.value = 0.0
-                seekSlider.max = it.stopTime.toMillis()
-
-                it.currentTimeProperty().addListener(listener { time ->
-                    if (!seeking) {
-                        println(time)
-                        playerAdjusting = true
-                        seekSlider.value = time.toMillis()
-                        playerAdjusting = false
-                    }
-                })
-            }
-            seekSlider.setOnMousePressed { _ -> seeking = true }
-            seekSlider.setOnMouseReleased { _ -> seeking = false }
-
-            seekSlider.valueProperty().addListener({ _, _, new ->
-                if (!playerAdjusting && Math.abs(new.toDouble() - player!!.currentTime.toMillis()) > 1000)
-                    seek(Duration.millis(new.toDouble()))
-            })
-
-
-			seekSlider.setOnMousePressed(e -> seekSlider.valueChangingProperty().set(true));
-			seekSlider.setOnMouseReleased(e -> seekSlider.valueChangingProperty().set(false));
-            seekSlider.setOnTouchPressed(e -> seekSlider.valueChangingProperty().set(true));
-			seekSlider.setOnTouchReleased(e -> {
-				System.out.println("touch released");
-				player.seek(Duration.millis(seekSlider.getValue()));
-				Platform.runLater(() -> seekSlider.valueChangingProperty().set(false));
-			});
-			seekSlider.setOnMousePressed(e -> seekSlider.valueChangingProperty().set(true));
-			seekSlider.setOnMouseReleased(e -> {
-				System.out.println("mouse released");
-				player.seek(Duration.millis(seekSlider.getValue()));
-				Platform.runLater(() -> seekSlider.valueChangingProperty().set(false));
-			});
-			
-			seekSlider.valueChangingProperty().addListener((p, ov, nv) -> logger.finer("SeekSlider changing: " + nv));
-			
-			seekSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
-				if (Math.abs(oldValue.doubleValue() - newValue.doubleValue()) > 1200)
-					player.seek(Duration.millis(newValue.doubleValue()));
-			})
-        }*/
         log?.run {
             //SysoutListener.addObserver(log::appendText);
             XerusLogger.addOutputStream(object : OutputStream() {
@@ -145,7 +98,7 @@ class MusicPlayer {
                 XerusLogger(value)
             }
         }
-        Platform.runLater {
+        onJFX {
             for (name in arrayOf("enableRatings", "enableRatingColors")) {
                 val nodes = StylingTools.find(root) { node -> name == node.id }
                 if (nodes.isEmpty()) continue
@@ -216,6 +169,7 @@ class MusicPlayer {
 
     @FXML
     fun repeat() {
+        // todo save repeatState in player
         repeatState = !repeatState
         logger.fine("Repeat: " + repeatState)
         player.repeat(repeatState)
@@ -261,7 +215,7 @@ class MusicPlayer {
         val alert = Alert(Alert.AlertType.INFORMATION)
         alert.title = "About"
         alert.headerText = null
-        alert.contentText = "This program is developed by Janek Fischer, contact: 27jf@web.de"
+        alert.contentText = "My $TITLE (alpha)"
         alert.show()
     }
 

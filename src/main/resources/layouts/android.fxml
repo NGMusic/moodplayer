@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 
-<?import xerus.music.view.FolderViewer?>
-<?import xerus.ktutil.javafx.ui.LogTextArea?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import xerus.music.view.FolderViewer?>
+<?import xerus.ktutil.javafx.ui.controls.SlideBar?>
+<?import xerus.ktutil.javafx.ui.controls.LogTextArea?>
 
 <VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="xerus.music.MusicPlayer"
       maxHeight="Infinity" maxWidth="Infinity">
@@ -40,7 +41,7 @@
             </VBox>
         </Tab>
     </TabPane>
-    <Label text="%curSong%" maxWidth="Infinity"/>
+    <Label text="\%curSong%" maxWidth="Infinity"/>
     <HBox alignment="CENTER_LEFT">
         <Label HBox.hgrow="SOMETIMES" text="Next: %nextSong%" maxWidth="Infinity"/>
         <Button id="regenerate" onAction="#regenerateNextSong"/>
@@ -55,5 +56,5 @@
         <Button id="save" onAction="#saveRatings" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>-->
     </HBox>
     <Slider fx:id="volumeSlider"/>
-    <Slider fx:id="seekSlider"/>
+    <SlideBar fx:id="seekSlider"/>
 </VBox>

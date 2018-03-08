@@ -6,9 +6,8 @@ import javafx.scene.layout.VBox
 import javafx.util.StringConverter
 import xerus.ktutil.javafx.*
 import xerus.ktutil.javafx.properties.bind
-import xerus.ktutil.javafx.properties.bindSoft
 import xerus.ktutil.javafx.properties.dependOn
-import xerus.ktutil.javafx.ui.FilteredTableView
+import xerus.ktutil.javafx.ui.controls.FilteredTableView
 import xerus.music.library.Library
 import xerus.music.library.Song
 import java.util.function.Predicate
@@ -73,9 +72,11 @@ class BPMViewer : VBox(5.0), SongViewer {
 			Predicate<Song> { song ->
 				(filterField == null || song.matches(filterField!!.text))
 				&& song.bpm?.let { bpm ->
-					val value = bpm.toDouble().div(speed.get())
-					val rounded = if(value > 1) value.roundToInt().toDouble() else 1 / (1/value).roundToInt().toDouble()
-					rounded.times(1 - tolerance.get()).rangeTo(rounded.times(1 + tolerance.get())).contains(value)
+					val mult = bpm.toDouble().div(speed.get())
+					val rounded = if(enableMultiples())
+						if(mult > 1) mult.roundToInt().toDouble() else 1 / (1/mult).roundToInt().toDouble()
+					else 1.0
+					rounded.times(1 - tolerance.get()).rangeTo(rounded.times(1 + tolerance.get())).contains(mult)
 				} ?: false
 			}
 		}, *dependencies.toTypedArray())

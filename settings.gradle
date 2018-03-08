@@ -1,3 +1,19 @@
+pluginManagement {
+	repositories {
+		gradlePluginPortal()
+		jcenter()
+	}
+	resolutionStrategy {
+		eachPlugin {
+			if (requested.id.id == "org.javafxports.jfxmobile") {
+				useModule("org.javafxports:jfxmobile-plugin:${requested.version}")
+			}
+		}
+	}
+}
+
 rootProject.name = 'MusicPlayer'
 
 includeBuild '../Util'
+includeBuild '../mpris-java'
+

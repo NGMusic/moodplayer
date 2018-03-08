@@ -2,21 +2,19 @@ package xerus.music.view
 
 import javafx.application.Platform
 import javafx.collections.FXCollections
-import javafx.collections.transformation.FilteredList
 import javafx.geometry.Insets
 import javafx.scene.control.Label
 import javafx.scene.control.TableRow
-import javafx.scene.control.TableView
 import javafx.scene.control.TextInputControl
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.CornerRadii
 import xerus.ktutil.javafx.properties.bind
-import xerus.ktutil.javafx.properties.bindSoft
 import xerus.ktutil.javafx.properties.dependOn
-import xerus.ktutil.javafx.ui.FilteredTableView
+import xerus.ktutil.javafx.ui.controls.FilteredTableView
 import xerus.music.Settings
 import xerus.music.library.Song
+import xerus.music.logger
 import java.util.function.Predicate
 
 class TableViewer : FilteredTableView<Song>(FXCollections.observableArrayList<Song>()), SongViewer {
@@ -25,7 +23,7 @@ class TableViewer : FilteredTableView<Song>(FXCollections.observableArrayList<So
         setOnMouseClicked { handleClick(it, selectionModel.selectedItem) }
 
         placeholder = Label("No Songs to show!")
-        
+
         setRowFactory {
             object : TableRow<Song>() {
                 override fun updateItem(item: Song?, empty: Boolean) {
@@ -43,6 +41,7 @@ class TableViewer : FilteredTableView<Song>(FXCollections.observableArrayList<So
 
     override fun populateView(songs: Iterable<Song>) {
         data.clear()
+        logger.finest("Songs: $songs")
         data.addAll(songs)
         Platform.runLater { refresh() }
     }

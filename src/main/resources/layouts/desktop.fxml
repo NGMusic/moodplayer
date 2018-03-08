@@ -5,7 +5,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import xerus.music.view.*?>
-<?import xerus.ktutil.javafx.ui.LogTextArea?>
+<?import xerus.ktutil.javafx.ui.controls.SlideBar?>
+<?import xerus.ktutil.javafx.ui.controls.LogTextArea?>
 
 <VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="xerus.music.MusicPlayer"
       minWidth="360" prefHeight="600.0" prefWidth="500.0">
@@ -38,7 +39,7 @@
         <Button id="save" onAction="#saveRatings" HBox.hgrow="SOMETIMES" maxWidth="Infinity"/>
         <Slider fx:id="volumeSlider" HBox.hgrow="SOMETIMES" prefWidth="200.0"/>
     </HBox>
-    <Slider VBox.vgrow="NEVER" fx:id="seekSlider"/>
+    <SlideBar VBox.vgrow="NEVER" fx:id="seekSlider"/>
     <HBox alignment="CENTER_LEFT" spacing="5">
         <padding>
             <Insets top="2" right="5" bottom="2" left="5"/>

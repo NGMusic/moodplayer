@@ -21,6 +21,7 @@ import xerus.ktutil.javafx.StylingTools
 import xerus.ktutil.javafx.applySkin
 import xerus.ktutil.javafx.checkJFX
 import xerus.ktutil.javafx.properties.*
+import xerus.mpris.MPRISPlayer
 import xerus.music.library.Library
 import xerus.music.library.brightness
 import xerus.music.player.Player
@@ -46,7 +47,7 @@ fun main(args: Array<String>) {
 	Application.launch(Launcher::class.java, *args)
 }
 
-private const val WINDOWTITLE = "Cognita Player"
+const val TITLE = "Cognita Player"
 
 class Launcher : Application() {
 	
@@ -80,7 +81,7 @@ class Launcher : Application() {
 	
 	override fun start(s: Stage) {
 		stage = s
-		stage.title = WINDOWTITLE
+		stage.title = TITLE
 		stage.icons.add(Image("css/satin/music.png"))
 		if (!isDesktop)
 			stage.isFullScreen = true
@@ -104,11 +105,13 @@ class Launcher : Application() {
 		
 		if (isDesktop)
 			stage.titleProperty().dependOn(curSong) {
-				var title = WINDOWTITLE
+				var title = TITLE
 				if (it != null)
-					title += " - " + it
+					title += " - $it"
 				title
 			}
+
+		Natives.instance.init()
 	}
 	
 	override fun stop() {
@@ -189,9 +192,10 @@ class Launcher : Application() {
 					for (declaration in declarations) {
 						val prop = invokeCSSMethod("Declaration", "getProperty", declaration)
 						if (prop == "-fx-base") {
+							@Suppress("UNCHECKED_CAST")
 							val parsedValue = invokeCSSMethod("Declaration", "getParsedValue", declaration) as ParsedValue<String, Color>
 							brightness = (StyleConverter.getColorConverter().convert(parsedValue, null).brightness - 0.7) / 3 + 0.7
-							logger.config("Song rating color brightness set to " + brightness)
+							logger.config("Song rating color brightness set to $brightness")
 							break@outer
 						}
 					}

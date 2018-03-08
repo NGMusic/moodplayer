@@ -23,7 +23,7 @@ apply plugin: 'org.javafxports.jfxmobile'
 println("Java version: ${JavaVersion.current()}")
 mainClassName = 'xerus.music.Launcher'
 
-//gradle run -Dexec.args="FINE save" < nul
+//gradle run -Dexec.args="FINE save"
 run { args System.getProperty('exec.args', '').split() }
 
 // region dependencies
@@ -43,8 +43,9 @@ repositories {
 dependencies {
     compile 'xerus.util:javafx'
     compile 'xerus.util:kotlin'
+    compile 'xerus.mpris:mpris-java'
 
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlinVersion
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: kotlinVersion
     compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '0.+'
 
     compile 'net.jthink:jaudiotagger:2.2.5'
@@ -52,14 +53,14 @@ dependencies {
 }
 
 jfxmobile {
+    downConfig {
+        plugins 'storage', 'settings'
+    }
     android {
         manifest = 'src/android/AndroidManifest.xml'
 
         compileSdkVersion = 26
         minSdkVersion = 26
-    }
-    downConfig {
-        plugins 'storage', 'settings'
     }
 }
 

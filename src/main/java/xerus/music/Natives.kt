@@ -6,6 +6,9 @@ import java.io.File
 abstract class Natives {
 	
 	protected abstract fun showNativeFileChooser(title: String, origin: File, extension: String): File?
+
+	/** can be used to initialize native services. Only called once after application startup. */
+	open fun init() {}
 	
 	companion object {
 		

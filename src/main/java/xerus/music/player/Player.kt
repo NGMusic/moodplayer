@@ -26,7 +26,7 @@ object Player {
         } catch (e: Exception) {
             throw RuntimeException("Couldn't create player!", e)
         }
-        logger.fine("Loaded volume " + volumeStart)
+        logger.fine("Loaded volume $volumeStart")
     }
 
     val curSong: ObjectProperty<Song> = object : SimpleObjectProperty<Song>() {
@@ -98,7 +98,7 @@ object Player {
         val cur = volumeCur.get()
         if (cur >= 1 && dif > 0 || cur <= 0 && dif < 0)
             return false
-        volumeCur.setValue(cur + dif)
+        volumeCur.value = cur + dif
         return true
     }
 

@@ -39,7 +39,6 @@ class Song(filename: String) : File(filename) {
     val tag: Tag
 
 
-
     init {
         val audioFile =
                 if (isDesktop)
