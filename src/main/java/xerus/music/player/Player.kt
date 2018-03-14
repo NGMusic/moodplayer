@@ -6,46 +6,48 @@ import javafx.beans.property.SimpleFloatProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import mu.KotlinLogging
 import xerus.ktutil.javafx.checkJFX
 import xerus.music.Settings
 import xerus.music.library.Library
 import xerus.music.library.Song
-import xerus.music.logger
 
 // volume functions: 1 - log(100-x)/log(100), (x/100)^4, exp(6.9*x/100)/1000, (x/100)^2
 
 object Player {
+    private val logger = KotlinLogging.logger {}
 
     val player: GeneralPlayer
 
     private val volumeDif = 0.05f
     private val volumeStart = Settings.VOLUME.get().toFloat()
+
     init {
         try {
             player = Class.forName("xerus.music.player.NativePlayer").newInstance() as GeneralPlayer
         } catch (e: Exception) {
             throw RuntimeException("Couldn't create player!", e)
         }
-        logger.fine("Loaded volume $volumeStart")
+        logger.debug("Loaded volume $volumeStart")
     }
 
     val curSong: ObjectProperty<Song> = object : SimpleObjectProperty<Song>() {
         override fun set(nv: Song?) {
             val ov = get()
-            if(nv == null && ov == null) return
+            if (nv == null && ov == null) return
 
             if (ov != null && Library.ratingsEnabled) {
-                SongHistory.addSong(ov, if(player.totalMillis.get() == 0) 0f else player.playedMillis.get().toFloat() / player.totalMillis.get(), nv != null)
+                SongHistory.addSong(ov, if (player.totalMillis.get() == 0) 0f else player.playedMillis.get().toFloat() / player.totalMillis.get(), nv != null)
             } else {
                 SongHistory.generateNextSong()
             }
 
             if (nv == null) {
                 player.stop()
-                logger.fine("Player stopping")
+                logger.debug("Player stopping")
             } else {
                 player.playSong(nv)
-                logger.fine("New current Song: " + nv.verboseString())
+                logger.debug("New current Song: " + nv.verboseString())
             }
             checkJFX {
                 super.set(nv)
@@ -61,6 +63,8 @@ object Player {
     }
     val volumeCur: FloatProperty = object : SimpleFloatProperty(volumeStart) {
         override fun set(nv: Float) {
+            if (nv == value)
+                return
             super.set(nv.coerceIn(0f, 1f))
             if (curSong.get() != null)
                 setPlayerVolume()

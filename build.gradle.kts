@@ -37,13 +37,17 @@ repositories {
 
 
 dependencies {
+    compile(kotlin("stdlib-jdk8"))
+
     compile("xerus.util", "javafx")
     compile("xerus.util", "kotlin")
 
-    compile("xerus.mpris", "mpris-java")
+    desktopCompile("xerus.mpris", "mpris")
+    desktopCompile("xerus.mpris", "mpris-extensions")
 
-    compile("org.jetbrains.kotlin", "kotlin-stdlib", kotlinVersion)
-    compile("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "0.+")
+    compile("org.slf4j", "slf4j-api", "1.7.25")
+    compile("io.github.microutils", "kotlin-logging", "1.5.+")
+    compile("ch.qos.logback", "logback-classic", "1.2.3")
 
     compile("net.jthink", "jaudiotagger", "2.2.4")
     compile("com.gluonhq", "charm-down-common", "2.0.1")

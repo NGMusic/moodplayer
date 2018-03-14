@@ -15,13 +15,13 @@ import javafx.scene.image.Image
 import javafx.scene.input.KeyEvent
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import org.slf4j.LoggerFactory
 import xerus.ktutil.*
 import xerus.ktutil.helpers.PseudoParser
 import xerus.ktutil.javafx.StylingTools
 import xerus.ktutil.javafx.applySkin
 import xerus.ktutil.javafx.checkJFX
 import xerus.ktutil.javafx.properties.*
-import xerus.mpris.MPRISPlayer
 import xerus.music.library.Library
 import xerus.music.library.brightness
 import xerus.music.player.Player
