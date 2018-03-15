@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import mu.KotlinLogging
 import xerus.ktutil.javafx.checkJFX
+import xerus.music.Natives
 import xerus.music.Settings
 import xerus.music.library.Library
 import xerus.music.library.Song
@@ -102,7 +103,7 @@ object Player {
         val cur = volumeCur.get()
         if (cur >= 1 && dif > 0 || cur <= 0 && dif < 0)
             return false
-        volumeCur.value = cur + dif
+        volumeCur.set(cur + dif)
         return true
     }
 
@@ -111,16 +112,14 @@ object Player {
     }
 
     fun handleVolumeButtons(event: KeyEvent) {
-        var handled = false
-        when (event.code) {
-            KeyCode.VOLUME_UP -> handled = adjustVolume(true)
-            KeyCode.VOLUME_DOWN -> handled = adjustVolume(false)
+        val adjustment = when(event.code) {
+            KeyCode.VOLUME_UP -> true
+            KeyCode.VOLUME_DOWN -> false
+            else -> return
         }
+        val handled = adjustVolume(adjustment) || Natives.instance.adjustVolume(true)
         if (handled)
             event.consume()
-        else {
-            // TODO native android volume control
-        }
     }
 
 }

@@ -15,5 +15,9 @@ class Native : Natives() {
             chooser.setExtension(extension)
         return chooser.showDialogAndWait()
     }
+    
+    override fun adjustVolume(increase: Boolean): Boolean {
+        return false
+    }
 
 }

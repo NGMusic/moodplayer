@@ -208,7 +208,6 @@ class Launcher : Application() {
 		
 		private val isJava8 = System.getProperty("java.specification.version").startsWith("1.")
 		private val cssPackage = (if (isJava8) "com.sun." else "") + "javafx.css."
-		@Throws(ReflectiveOperationException::class)
 		private fun invokeCSSMethod(classname: String, methodName: String, target: Any?, vararg params: Any): Any {
 			val clazz = Class.forName(cssPackage + classname)
 			val paramClasses = params.map { it.javaClass }.toTypedArray()

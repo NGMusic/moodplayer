@@ -7,7 +7,7 @@ import java.io.File
 
 class Native : Natives() {
 
-    public override fun showNativeFileChooser(title: String, origin: File, extension: String): File? =
+    override fun showNativeFileChooser(title: String, origin: File, extension: String): File? =
             if (extension == "directory") {
                 val chooser = DirectoryChooser()
                 chooser.initialDirectory = origin
@@ -20,6 +20,10 @@ class Native : Natives() {
                 chooser.title = title
                 chooser.showOpenDialog(stage)
             }
+    
+    override fun adjustVolume(increase: Boolean): Boolean {
+        return false
+    }
 
     override fun init() {
         if (System.getProperty("os.name").startsWith("linux", true))
