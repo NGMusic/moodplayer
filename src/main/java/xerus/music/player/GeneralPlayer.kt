@@ -4,12 +4,11 @@ import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import xerus.music.library.Song
+import xerus.music.logger
 import java.io.File
 import java.util.logging.Level
 
 abstract class GeneralPlayer {
-	
-	val logger = LoggerFactory.getLogger("xerus.music.player")
 	
 	val playedMillis = SimpleIntegerProperty()
 	val totalMillis = SimpleIntegerProperty()
