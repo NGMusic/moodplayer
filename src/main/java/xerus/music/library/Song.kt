@@ -3,25 +3,13 @@ package xerus.music.library
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.tag.FieldKey
-import org.jaudiotagger.tag.FieldKey.*
-import org.jaudiotagger.tag.Tag
-import org.jaudiotagger.tag.id3.ID3v22Tag
-import org.slf4j.LoggerFactory
-import xerus.ktutil.printWith
-import xerus.music.isDesktop
+import xerus.music.library.TagKey.*
 import xerus.music.logger
 import java.io.File
-import java.util.logging.Logger
-import java.util.regex.Pattern
 
 const val ENABLETAGGING = true
 const val DEFAULTGAIN = -8.0
 const val DEFAULTRATING = 6f
-
-
-fun String?.nullIfEmpty(): String? = if (this.isNullOrEmpty()) null else this
 
 var brightness: Double = 0.0
 fun hsv(hue: Double): Color = Color.hsb(hue, 0.6, brightness)
@@ -31,65 +19,26 @@ class Song(filename: String) {
 
     constructor(file: Any) : this(file.toString())
 
-    @JvmField
-    val id: Int
     val file = File(filename)
-    val tags = Metadata()
+    lateinit var tags: Metadata
 
-    init {
-        val audioFile =
-                if (isDesktop)
-                    try {
-                        AudioFileIO.read(file)
-                    } catch (e: Exception) {
-                        null
-                    }
-                else
-                    null
-        val tag = audioFile?.tag?.also {
-            it.getAll(ARTIST).joinToString(", ").nullIfEmpty()?.let { tags.put("artist", it) }
-            it.getFirst(TITLE).nullIfEmpty()?.let { tags.put("title", it) }
-            it.getFirst(ALBUM).nullIfEmpty()?.let { tags.put("album", it) }
-            it.getFirst(GENRE).nullIfEmpty()?.let { tags.put("genre", it) }
-            it.getFirst(BPM).nullIfEmpty()?.let { tags.put("bpm", it) }
-        } ?: audioFile?.createDefaultTag()
-
-        if (tag?.hasField(CUSTOM4) == true) {
-            id = Integer.parseInt(tag.getFirst(CUSTOM4))
-        } else {
-            id = Library.nextID
-            if (ENABLETAGGING && audioFile != null && tag != null) {
-                try {
-                    tag.setField(CUSTOM4, id.toString())
-                    audioFile.commit()
-                } catch (e: Exception) {
-                    logger.throwing("Song", "Writing ID to Tag", e)
-                }
-            }
-        }
-    }
+    val id
+        get() = tags.id
 
     // region Tags
 
-    val gain: Float = run {
-        var gain = DEFAULTGAIN
-        for (field in tag.fields) {
-            if ((field.id + field.toString()).contains("replaygain_track_gain")) {
-                val matcher = gainPattern.matcher(field.toString())
-                if (matcher.find())
-                    gain = matcher.group().toDouble()
-                else
-                    logger.finer("Couldn't extract ReplayGain from $name of Tag ${field.id}$field")
-                break
-            }
-        }
-        Math.pow(10.0, gain / 20).toFloat()
-    }
-    val artist: String? = tag.getAll(ARTIST).joinToString(", ").nullIfEmpty()
-    val title: String? = tag.getFirst(TITLE).nullIfEmpty()
-    val album: String? = tag.getFirst(ALBUM).nullIfEmpty()
-    val genre: String? = tag.getFirst(GENRE).nullIfEmpty()
-    val bpm: Int? = tag.getFirst(BPM).toIntOrNull()
+    val gain: Float?
+        get() = tags[TRACKGAIN]?.toFloat()
+    val artist: String?
+        get() = tags[ARTIST]
+    val title: String?
+        get() = tags[TITLE]
+    val album: String?
+        get() = tags[ALBUM]
+    val genre: String?
+        get() = tags[GENRE]
+    val bpm: Int?
+        get() = tags[BPM]?.toInt()
 
     val name = file.name
 
@@ -146,7 +95,8 @@ class Song(filename: String) {
 
     //endregion
 
-    val source = file.toURI().toString()
+    val uri
+        get() = file.toURI().toString()
 
     val color: ObjectProperty<Color> = SimpleObjectProperty<Color>()
 
@@ -165,30 +115,6 @@ class Song(filename: String) {
 
 }
 
-val gainPattern: Pattern = Pattern.compile("-?[.\\d]+")
-val Tag.replayGain
-    get() = run {
-        var gain = DEFAULTGAIN
-        for (field in fields) {
-            if ((field.id + field.toString()).contains("replaygain_track_gain")) {
-                val matcher = gainPattern.matcher(field.toString())
-                if (matcher.find())
-                    gain = matcher.group().toDouble()
-                else
-                    logger.finer("Couldn't extract ReplayGain of Tag ${field.id}$field")
-                break
-            }
-        }
-        Math.pow(10.0, gain / 20).toFloat()
-    }
-
-private val Double.toGain() = Math.pow(10.0, this / 20)
-
-class Metadata : HashMap<CharSequence, CharSequence?>() {
-
-
-
-}
 
 /*
 interface Ratable {

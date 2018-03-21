@@ -36,7 +36,7 @@ class NativePlayer : GeneralPlayer() {
 
     override fun loadSong(song: Song) {
         releasePlayer()
-        player.setDataSource(song.source)
+        player.setDataSource(song.uri)
         player.prepare()
     }
 

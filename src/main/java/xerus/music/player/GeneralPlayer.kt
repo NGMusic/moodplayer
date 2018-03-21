@@ -52,6 +52,6 @@ abstract class GeneralPlayer {
 	abstract fun seek(millis: Int)
 	abstract fun repeat(repeat: Boolean)
 	
-	fun log(msg: String, level: Level = Level.FINER) = logger.log(level, "PLAYER " + msg)
+	fun log(msg: String, level: Level = Level.FINER) = logger.log(level, "PLAYER $msg")
 	
 }

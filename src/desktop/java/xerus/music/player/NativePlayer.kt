@@ -14,7 +14,7 @@ class NativePlayer : GeneralPlayer() {
 
     override fun loadSong(song: Song) {
         player?.dispose()
-        player = MediaPlayer(Media(song.source)).apply {
+        player = MediaPlayer(Media(song.uri)).apply {
             setOnReady {
                 playedMillis.dependOn(currentTimeProperty(), { it.toMillis() })
                 totalMillis.set(stopTime.toMillis().toInt())
