@@ -67,7 +67,7 @@ class MPRISPlayer : AbstractMPRISPlayer() {
             metadata = PropertyMap {
                 put("mpris:trackid", "/$TITLE/songs/" + song.toString().replace(Regex("\\W"), ""))
                 put("mpris:length", Player.player.totalMillis.get() * 1000)
-                put("xesam:artist", song.tag.getAll(FieldKey.ARTIST) + song.tag.getAll(FieldKey.ARTISTS))
+                put("xesam:artist", song.artist ?: "")
                 put("xesam:title", song.title.orEmpty())
             }
         }

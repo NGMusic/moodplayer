@@ -5,7 +5,6 @@ import org.jaudiotagger.audio.AudioHeader
 import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.Tag
 import xerus.ktutil.XerusLogger
-import java.util.*
 import java.util.regex.Pattern
 
 val gainPattern: Pattern = Pattern.compile("-?[.\\d]+")
@@ -26,8 +25,11 @@ val Tag.trackGain
 	}
 
 private fun Double.toGain() = Math.pow(10.0, this / 20).toFloat()
+val DEFAULTGAIN = (-8.0).toGain()
 
-open class Key(private val function: (AudioFile) -> String?) {
+const val DEFAULTRATING = 6f
+
+open class Key<out T>(private val function: (AudioFile) -> T?) {
 	
 	init {
 		values.add(this)
@@ -36,24 +38,32 @@ open class Key(private val function: (AudioFile) -> String?) {
 	fun get(audioFile: AudioFile) = function(audioFile)
 	
 	companion object {
-		val values = ArrayList<Key>()
+		val values = ArrayList<Key<*>>()
+		val tags = ArrayList<TagKey>()
 		
 		val ARTIST = TagKey(FieldKey.ARTIST, { it.tag.getAll(FieldKey.ARTIST).joinToString(", ") })
 		val TITLE = TagKey(FieldKey.TITLE)
 		val ALBUM = TagKey(FieldKey.ALBUM)
 		val GENRE = TagKey(FieldKey.GENRE)
 		val BPM = TagKey(FieldKey.BPM)
-		val TRACKGAIN = Key { it.tag.trackGain?.toString() }
-		val LENGTH = headerKey { it.trackLength.toString() }
+		val TRACKGAIN = Key { it.tag.trackGain }
+		val LENGTH = headerKey { it.trackLength }
+		val BITRATE = headerKey { it.bitRateAsNumber }
 	}
 }
 
-class TagKey(val fieldKey: FieldKey, function: (AudioFile) -> String = { it.tag.getFirst(fieldKey) }) : Key(function) {
+class TagKey(val fieldKey: FieldKey, function: (AudioFile) -> String = { it.tag.getFirst(fieldKey) }) : Key<String>(function) {
+	
+	init {
+		Key.tags.add(this)
+	}
+	
 	fun set(audioFile: AudioFile, value: String, commit: Boolean = true) {
 		audioFile.tag.setField(fieldKey, value)
 		if (commit)
 			audioFile.commit()
 	}
+	
 }
 
-inline fun headerKey(crossinline function: (AudioHeader) -> String) = Key({ function(it.audioHeader) })
+inline fun <T> headerKey(crossinline function: (AudioHeader) -> T) = Key({ function(it.audioHeader) })

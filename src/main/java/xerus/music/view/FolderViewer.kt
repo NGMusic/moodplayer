@@ -79,7 +79,7 @@ class FolderViewer : TreeView<Any>(), SongViewer {
 		val nodes = HashMap<String, FilterableTreeItem<String>>()
 		nodes.put(Library.main.name, root)
 		for (s in songs) {
-			val parent = s.parentFile.name
+			val parent = s.file.parentFile.name
 			var node: FilterableTreeItem<String>? = nodes[parent]
 			if (node == null) {
 				node = FilterableTreeItem(parent)

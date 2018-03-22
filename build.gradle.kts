@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.Paths
 
 plugins {
-    kotlin("jvm") version kotlinVersion
+    kotlin("jvm") version "1.2.30"
     java
     application
     id("com.github.johnrengelman.shadow") version "2.0.1"

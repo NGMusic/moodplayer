@@ -4,17 +4,17 @@ import org.jaudiotagger.audio.AudioFile
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import xerus.ktutil.XerusLogger
-import xerus.ktutil.nullIfEmpty
 import xerus.music.isDesktop
 import java.io.File
 import java.util.*
 
+const val ENABLETAGGING = true
 
-private fun AudioFile.get(key: Key): String? = key.get(this).nullIfEmpty()
+private fun <T> AudioFile.get(key: Key<T>): T? = key.get(this).takeUnless { it is String && it.isEmpty() }
 
 class Metadata(val id: Int) {
 	
-	val map = IdentityHashMap<Key, String>()
+	val map = IdentityHashMap<Key<*>, Any>()
 	
 	var modified = false
 	
@@ -23,11 +23,12 @@ class Metadata(val id: Int) {
 			audioFile.get(key)?.let { set(key, it) }
 	}
 	
-	private operator fun set(key: Key, value: String) {
-		map.put(key, value)
-	}
+	private fun <T> set(key: Key<T>, value: T) =
+			map.put(key, value)
 	
-	operator fun get(key: Key) = map[key]
+	@Suppress("UNCHECKED_CAST")
+	operator fun <T> get(key: Key<T>) =
+			map[key] as T?
 	
 	companion object {
 		

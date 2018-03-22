@@ -83,7 +83,7 @@ object Library {
 			logger.finer("Writing song cache with ${_songs.size}")
 			cache.resolve("songs").outputStream().bufferedWriter().use { file ->
 				_songs.forEach {
-					file.write(it.id.toString() + " " + it.relativeTo(main))
+					file.write(it.id.toString() + " " + it.file.relativeTo(main))
 				}
 			}
 		}

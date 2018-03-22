@@ -9,13 +9,8 @@ import xerus.music.library.Key.*
 import xerus.music.logger
 import java.io.File
 
-const val ENABLETAGGING = true
-const val DEFAULTGAIN = -8.0
-const val DEFAULTRATING = 6f
-
 var brightness: Double = 0.0
 fun hsv(hue: Double): Color = Color.hsb(hue, 0.6, brightness)
-
 
 class Song(filename: String) {
 
@@ -29,17 +24,17 @@ class Song(filename: String) {
 
     // region Tags
 
-    val gain: Float?
-        get() = tags[Key.TRACKGAIN]?.toFloat()
-    val artist: String?
+    val gain
+        get() = tags[Key.TRACKGAIN]?.toFloat() ?: DEFAULTGAIN
+    val artist
         get() = tags[Key.ARTIST]
-    val title: String?
+    val title
         get() = tags[Key.TITLE]
-    val album: String?
+    val album
         get() = tags[Key.ALBUM]
-    val genre: String?
+    val genre
         get() = tags[Key.GENRE]
-    val bpm: Int?
+    val bpm
         get() = tags[Key.BPM]?.let { it.toIntOrNull().ifNull { logger.warning("Invalid BPM: \"$it\"") } }
 
     val name = file.name
