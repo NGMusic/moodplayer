@@ -3,7 +3,9 @@ package xerus.music.library
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color
-import xerus.music.library.TagKey.*
+import xerus.ktutil.ifNotNull
+import xerus.ktutil.ifNull
+import xerus.music.library.Key.*
 import xerus.music.logger
 import java.io.File
 
@@ -28,17 +30,17 @@ class Song(filename: String) {
     // region Tags
 
     val gain: Float?
-        get() = tags[TRACKGAIN]?.toFloat()
+        get() = tags[Key.TRACKGAIN]?.toFloat()
     val artist: String?
-        get() = tags[ARTIST]
+        get() = tags[Key.ARTIST]
     val title: String?
-        get() = tags[TITLE]
+        get() = tags[Key.TITLE]
     val album: String?
-        get() = tags[ALBUM]
+        get() = tags[Key.ALBUM]
     val genre: String?
-        get() = tags[GENRE]
+        get() = tags[Key.GENRE]
     val bpm: Int?
-        get() = tags[BPM]?.toInt()
+        get() = tags[Key.BPM]?.let { it.toIntOrNull().ifNull { logger.warning("Invalid BPM: \"$it\"") } }
 
     val name = file.name
 
