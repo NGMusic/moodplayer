@@ -16,4 +16,4 @@ rootProject.name = 'MusicPlayer'
 
 includeBuild '../Util'
 includeBuild '../mpris-java'
-
+includeBuild '../SmartPlay'
