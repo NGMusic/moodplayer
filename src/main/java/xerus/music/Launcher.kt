@@ -15,12 +15,12 @@ import javafx.scene.image.Image
 import javafx.scene.input.KeyEvent
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-import org.slf4j.LoggerFactory
 import xerus.ktutil.*
-import xerus.ktutil.helpers.PseudoParser
+import xerus.ktutil.helpers.Parser
+import xerus.ktutil.helpers.ParserException
 import xerus.ktutil.javafx.StylingTools
 import xerus.ktutil.javafx.applySkin
-import xerus.ktutil.javafx.checkJFX
+import xerus.ktutil.javafx.checkFx
 import xerus.ktutil.javafx.properties.*
 import xerus.music.library.Library
 import xerus.music.library.brightness
@@ -110,7 +110,7 @@ class Launcher : Application() {
 					title += " - $it"
 				title
 			}
-
+		
 		Natives.instance.init()
 	}
 	
@@ -143,11 +143,11 @@ class Launcher : Application() {
 			// Placeholders
 			@Suppress("unchecked_cast")
 			val labels = StylingTools.find(root) { it is Labeled && it.text.contains("%") } as Collection<Labeled>
-			if(labels.isNotEmpty()) {
-				val parser = PseudoParser('%')
+			if (labels.isNotEmpty()) {
+				val parser = Parser('%')
 				val available = mapOf(Pair("curSong", Player.curSong), Pair("nextSong", Player.nextSong),
-						Pair("playedTime", Player.player.playedMillis.dependentObservable { formatTimeDynamic(it.toInt()) }),
-						Pair("totalTime", Player.player.totalMillis.dependentObservable { formatTimeDynamic(it.toInt(), Player.player.totalMillis.get()) }),
+						Pair("playedTime", Player.player.playedMillis.dependentObservable { formatTimeDynamic(it.toLong()) }),
+						Pair("totalTime", Player.player.totalMillis.dependentObservable { formatTimeDynamic(it.toLong(), Player.player.totalMillis.get().toLong()) }),
 						Pair("clock", TimedObservable(1000) { formattedTime() }))
 				for (label in labels) {
 					val placeholders = available.filter { label.text.contains(it.key) }
@@ -155,16 +155,16 @@ class Launcher : Application() {
 						continue
 					try {
 						val matcher = parser.createMatcher(label.text,
-								*placeholders.mapTo(ArrayList(placeholders.size), { it.key }).toTypedArray())
+								*placeholders.mapTo(ArrayList(placeholders.size)) { it.key }.toTypedArray())
 						val properties =
-								placeholders.mapTo(ArrayList(placeholders.size), { it.value }).toTypedArray()
-						checkJFX {
+								placeholders.mapTo(ArrayList(placeholders.size)) { it.value }.toTypedArray()
+						checkFx {
 							label.textProperty().bindSoft({
 								matcher.apply(*properties.map { it.value?.toString() ?: " - " }.toTypedArray())
 										.also { label.tooltip = Tooltip(it) }
 							}, *properties)
 						}
-					} catch (e: PseudoParser.ParserException) {
+					} catch (e: ParserException) {
 						logger.warning(e.match + " is not a valid placeholder in Labeled " + label)
 					}
 				}
@@ -177,7 +177,7 @@ class Launcher : Application() {
 			stage.minHeight = root.minHeight(-1.0)
 			applyCSS()
 			if (!isDesktop)
-				scene.addEventFilter(KeyEvent.KEY_PRESSED, { Player.handleVolumeButtons(it) })
+				scene.addEventFilter(KeyEvent.KEY_PRESSED) { Player.handleVolumeButtons(it) }
 		}
 		
 		// region CSS Color hacking

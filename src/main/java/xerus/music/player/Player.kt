@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import mu.KotlinLogging
-import xerus.ktutil.javafx.checkJFX
+import xerus.ktutil.javafx.checkFx
 import xerus.music.Natives
 import xerus.music.Settings
 import xerus.music.library.Library
@@ -50,7 +50,7 @@ object Player {
                 player.playSong(nv)
                 logger.debug("New current Song: " + nv.verboseString())
             }
-            checkJFX {
+            checkFx {
                 super.set(nv)
                 if (nv != null)
                     setPlayerVolume()
@@ -59,7 +59,7 @@ object Player {
     }
     val nextSong: ObjectProperty<Song?> = object : SimpleObjectProperty<Song?>() {
         override fun set(newValue: Song?) {
-            checkJFX { super.set(newValue) }
+            checkFx { super.set(newValue) }
         }
     }
     val volumeCur: FloatProperty = object : SimpleFloatProperty(volumeStart) {

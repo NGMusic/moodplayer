@@ -12,8 +12,4 @@ pluginManagement {
 	}
 }
 
-rootProject.name = 'MusicPlayer'
-
-includeBuild '../Util'
-includeBuild '../mpris-java'
-includeBuild '../SmartPlay'
+rootProject.name = 'SmartPlayer'

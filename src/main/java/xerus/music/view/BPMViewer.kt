@@ -57,7 +57,7 @@ class BPMViewer : VBox(5.0), SongViewer {
 	override fun populateView(songs: Iterable<Song>) {
 		view.data.clear()
 		view.data.addAll(songs)
-		onJFX { view.refresh() }
+		onFx { view.refresh() }
 	}
 	
 	override fun bindFilter(field: TextInputControl) {

@@ -7,8 +7,8 @@ import javafx.fxml.FXML
 import javafx.scene.control.*
 import xerus.ktutil.XerusLogger
 import xerus.ktutil.javafx.StylingTools
-import xerus.ktutil.javafx.onJFX
-import xerus.ktutil.javafx.properties.UnmodifiableObservableList
+import xerus.ktutil.javafx.onFx
+import xerus.ktutil.javafx.properties.ImmutableObservableList
 import xerus.ktutil.javafx.properties.dependOn
 import xerus.ktutil.javafx.ui.controls.LogTextArea
 import xerus.ktutil.javafx.ui.controls.SlideBar
@@ -92,13 +92,13 @@ class MusicPlayer {
             })
         }
         loglevel?.run {
-            items = UnmodifiableObservableList("SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST")
+            items = ImmutableObservableList("SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST")
             selectionModel.select(Settings.LOGLEVEL.get())
             setOnAction {
                 XerusLogger(value)
             }
         }
-        onJFX {
+        onFx {
             for (name in arrayOf("enableRatings", "enableRatingColors")) {
                 val nodes = StylingTools.find(root) { node -> name == node.id }
                 if (nodes.isEmpty()) continue

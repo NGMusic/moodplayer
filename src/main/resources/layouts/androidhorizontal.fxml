@@ -32,7 +32,7 @@
             </Tab>
             <Tab text="Settings">
                 <VBox>
-                    <!--<ToggleButton id="enableRatingColors" text="Show Rating colors"/>-->
+                    <!--<ToggleButton id="enableRatingColors" text="Show xerus.ratings.Rating colors"/>-->
                     <Button onAction="#selectLibraryFolder" text="Select Library"/>
                     <Button onAction="#selectLayout" text="Select Layout"/>
                     <Button onAction="#selectCSS" text="Select Style"/>

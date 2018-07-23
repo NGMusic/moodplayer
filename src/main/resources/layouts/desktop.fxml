@@ -19,7 +19,7 @@
             <CheckMenuItem id="enableRatings" text="Enable Ratings"/>
         </Menu>
         <Menu text="View">
-            <CheckMenuItem id="enableRatingColors" text="Show Rating colors"/>
+            <CheckMenuItem id="enableRatingColors" text="Show xerus.ratings.Rating colors"/>
             <MenuItem onAction="#selectLayout" text="Select Layout"/>
             <MenuItem onAction="#selectCSS" text="Select Style"/>
             <MenuItem onAction="#resetLayouts" text="Reset layout"/>

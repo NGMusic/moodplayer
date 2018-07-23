@@ -27,8 +27,6 @@ val Tag.trackGain
 private fun Double.toGain() = Math.pow(10.0, this / 20).toFloat()
 val DEFAULTGAIN = (-8.0).toGain()
 
-const val DEFAULTRATING = 6f
-
 open class Key<out T>(private val function: (AudioFile) -> T?) {
 	
 	init {

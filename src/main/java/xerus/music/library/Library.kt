@@ -4,20 +4,23 @@ import javafx.collections.FXCollections
 import javafx.collections.transformation.FilteredList
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
+import org.slf4j.LoggerFactory
 import xerus.ktutil.helpers.SimpleRefresher
 import xerus.ktutil.helpers.WeakCollection
-import xerus.ktutil.javafx.onJFX
+import xerus.ktutil.javafx.onFx
 import xerus.ktutil.toByteArray
 import xerus.ktutil.toInt
+import xerus.util.Storage
 import xerus.music.Launcher
 import xerus.music.Settings
-import xerus.music.logger
 import xerus.music.player.SongHistory
 import xerus.music.view.SongViewer
 import java.io.*
 import java.util.*
 
 object Library {
+	
+	val logger = LoggerFactory.getLogger(Library::class.java)
 	
 	lateinit var main: File
 		private set
@@ -46,7 +49,7 @@ object Library {
 		main = File(mainLib)
 		ratingsPath = cache.resolve("ratings")
 		ratingsBackup = cache.resolve(ratingsPath.name + ".bak")
-		logger.config("Library initializing " + mainLib)
+		logger.info("Library initializing $mainLib")
 		
 		launch {
 			addViews(*viewers)
@@ -56,7 +59,7 @@ object Library {
 			if (main.exists() && main.canRead())
 				addLibrary(main)
 			else
-				logger.warning("Library path $main not accessible")
+				logger.warn("Library path $main not accessible")
 		}
 	}
 	
@@ -67,7 +70,7 @@ object Library {
 		while (queue.isNotEmpty()) {
 			val file = queue.poll()
 			if (file.isDirectory) {
-				logger.finest("Found directory $file")
+				logger.trace("Found directory $file")
 				queue.addAll(file.listFiles())
 			} else {
 				addSong(file)
@@ -80,14 +83,14 @@ object Library {
 		else
 			SongHistory.generateNextSong()
 		launch {
-			logger.finer("Writing song cache with ${_songs.size}")
+			logger.debug("Writing song cache with ${_songs.size}")
 			cache.resolve("songs").outputStream().bufferedWriter().use { file ->
 				_songs.forEach {
 					file.write(it.id.toString() + " " + it.file.relativeTo(main))
 				}
 			}
 		}
-		logger.finer("Library $path added")
+		logger.debug("Library $path added")
 	}
 	
 	private fun addSong(file: File) {
@@ -100,7 +103,7 @@ object Library {
 		}
 		val song = Song(file)
 		val id = song.id
-		_songs.add(id, song)
+		_songs[id] = song
 		if (id > lastID)
 			lastID = id
 		song.initRatings(lines[id])
@@ -117,7 +120,7 @@ object Library {
 		if (viewers.isEmpty())
 			return
 		views.addAll(viewers)
-		logger.fine("Added viewers: ${Arrays.toString(viewers)}")
+		logger.debug("Added viewers: ${Arrays.toString(viewers)}")
 		if (!inited)
 			return
 		if (working)
@@ -131,12 +134,12 @@ object Library {
 		while (working)
 			delay(200)
 		views.clean(2)
-		logger.config(String.format("Populating %s views with %s Songs", views.size, _songs.trueSize))
+		logger.info(String.format("Populating %s views with %s Songs", views.size, _songs.trueSize))
 		views.forEach { populateView(it) }
 	}
 	
 	private fun populateView(viewer: SongViewer) {
-		onJFX { viewer.populate(_songs) }
+		onFx { viewer.populate(_songs) }
 	}
 	
 	//endregion
@@ -181,11 +184,11 @@ object Library {
 						lines.add(line)
 					}
 				}
-				logger.fine("Library read ratings from file")
+				logger.info("Library read ratings from file")
 				return true
 			} catch (e: Exception) {
 				lines.clear()
-				logger.throwing("Library", "readRatings", e)
+				logger.warn("Library#readRatings", e)
 			}
 		}
 		return false
@@ -211,25 +214,25 @@ object Library {
 		launch {
 			while (working)
 				delay(300)
-			logger.fine("Library is writing ratings to file...")
+			logger.debug("Library is writing ratings to file...")
 			if (ratingsPath.exists()) {
 				if (ratingsBackup.exists())
 					ratingsBackup.delete()
 				ratingsPath.renameTo(ratingsBackup)
 			}
 			try {
-				FileOutputStream(ratingsPath).buffered().use { out ->
+				ratingsPath.outputStream().buffered().use { out ->
 					out.write(version)
 					out.write(lastID.toByteArray())
 					for (i in 0 until Math.max(_songs.size, lines.size)) {
-						_songs[i]?.run { lines[i] = serialiseRatings() }
+						_songs[i]?.run { lines[i] = ratings.serialize() }
 						lines[i]?.let { out.write(it) }
 						out.write(lineSeparator)
 					}
 				}
-				logger.config("Ratings written to " + ratingsPath)
+				logger.info("Ratings written to $ratingsPath")
 			} catch (e: IOException) {
-				Launcher.showError("Couldn't write database to " + ratingsPath, e)
+				Launcher.showError("Couldn't write database to $ratingsPath", e)
 			}
 		}
 	}

@@ -17,7 +17,7 @@ abstract class Natives {
 		val instance = Class.forName("xerus.music.Native").newInstance() as Natives
 		
 		fun showFileChooser(title: String, origin: String, extension: String) =
-				instance.showNativeFileChooser(title, findFolder(File(origin)), extension)
+				instance.showNativeFileChooser(title, File(origin).findFolder(), extension)
 	}
 	
 }

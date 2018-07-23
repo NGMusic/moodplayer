@@ -54,7 +54,7 @@ object SongHistory {
         }
 
         internal fun getRating(s: Song): Float {
-            return song.getRating(s.id) * influence
+            return song.ratings.getRating(s.id) * influence
         }
 
         override fun toString(): String {
@@ -70,9 +70,9 @@ object SongHistory {
     fun updateRatings(s: Song?, change: Float, vararg flatchange: Float) {
         if (noRatings() || s == null)
             return
-        s.updateRating(if (flatchange.isNotEmpty()) change + flatchange[0] else change)
+        s.ratings.updateRating(if (flatchange.isNotEmpty()) change + flatchange[0] else change)
         history.filterNotNull().forEach {
-            it.song.updateRating(s, it.multiplier * change)
+            it.song.ratings.updateRating(s.ratings, it.multiplier * change)
         }
     }
 
@@ -127,10 +127,10 @@ object SongHistory {
                 }
             }
             
-            logger.finer("History: " + historyList)
+            logger.finer("History: $historyList")
             val historyArray = historyList.toTypedArray()
             for (s in Library.songs) {
-                val rating = s.getRating() + historyArray.map { it.getRating(s) }.sum().coerceAtLeast(0f)
+                val rating = s.ratings.getRating() + historyArray.map { it.getRating(s) }.sum().coerceAtLeast(0f)
                 s.computeColor((rating / influenceSum).toDouble())
                 nextGenerator.add(s, (1 shl rating.toInt()).toFloat())
             }
