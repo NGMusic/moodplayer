@@ -1,6 +1,6 @@
-# SmartPlayer (until it gets a better name)
+# MoodPlayer
 
-> I recommend not cloning the project right now. it is very unpolished and likely to be force-pushed.
+> I recommend not cloning the project right now. It is very unpolished and likely to be force-pushed.
 
 This player is written in Kotlin using JavaFX 
 and works on both Desktop and Android using JavaFXPorts.
