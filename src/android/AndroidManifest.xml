@@ -4,7 +4,7 @@
         <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
         <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-        <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="26"/>
+        <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="26"/>
         <application android:label="MusicPlayer" android:name="android.support.multidex.MultiDexApplication" android:icon="@mipmap/ic_launcher">
                 <activity android:name="javafxports.android.FXActivity" android:label="MusicPlayer" android:configChanges="orientation|screenSize">
                         <meta-data android:name="main.class" android:value="xerus.music.Launcher"/>

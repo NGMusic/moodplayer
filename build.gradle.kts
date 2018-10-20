@@ -18,20 +18,14 @@ buildscript {
 }
 
 plugins {
-	kotlin("jvm") version "1.2.51"
-	java
+	kotlin("jvm") version "1.2.71"
 	application
-	id("com.github.johnrengelman.shadow") version "2.0.3"
-	id("org.javafxports.jfxmobile") version "1.3.10"
-	id("com.github.ben-manes.versions") version "0.17.0"
+	id("com.github.johnrengelman.shadow") version "4.0.1"
+	id("org.javafxports.jfxmobile") version "1.3.15"
+	id("com.github.ben-manes.versions") version "0.20.0"
 }
 
 group = "xerus.music"
-
-val kotlinVersion: String by extra {
-	buildscript.configurations["classpath"].resolvedConfiguration.firstLevelModuleDependencies
-			.find { it.moduleName == "org.jetbrains.kotlin.jvm.gradle.plugin" }!!.moduleVersion
-}
 
 application {
 	mainClassName = "xerus.music.Launcher"
@@ -49,25 +43,23 @@ repositories {
 }
 
 dependencies {
-	compile(kotlin("stdlib"))
-	
 	compile("com.github.Xerus2000.util", "javafx", "master-SNAPSHOT")
 	
 	// Music
-	compile("com.github.Xerus2000", "smartplay", "master-SNAPSHOT")
+	compile("com.github.ngmusic", "moodplay", "master-SNAPSHOT")
 	compile("net.jthink", "jaudiotagger", "2.2.4")
 	
 	// Logging
 	compile("org.slf4j", "slf4j-api", "1.7.25")
 	compile("io.github.microutils", "kotlin-logging", "1.5.4")
-	compile("ch.qos.logback", "logback-classic", "1.2.3")
+	implementation("ch.qos.logback", "logback-classic", "1.2.3")
 	
 	// Platform-specifics
 	val CHARM_DOWN_VERSION = "2.0.1"
 	compile("com.gluonhq", "charm-down-common", CHARM_DOWN_VERSION)
 	
 	desktopRuntime("com.gluonhq", "charm-down-desktop", CHARM_DOWN_VERSION)
-	desktopRuntime("org.xerial", "sqlite-jdbc", "3.21.0.1")
+	desktopRuntime("org.xerial", "sqlite-jdbc", "3.25.2")
 	
 	androidRuntime("com.gluonhq", "charm-down-android", CHARM_DOWN_VERSION)
 	androidRuntime("org.sqldroid", "sqldroid", "1.0.3")
@@ -90,7 +82,7 @@ jfxmobile {
 	android {
 		manifest = "src/android/AndroidManifest.xml"
 		
-		compileSdkVersion = "24"
+		compileSdkVersion = "26"
 		minSdkVersion = "21"
 	}
 }
@@ -110,17 +102,17 @@ tasks {
 		group = ANDROID
 	}
 	
-	"apk" {
+	create("apk") {
 		group = ANDROID
 		dependsOn("clean", androidApk)
 	}
 	
-	"pushApk"(Exec::class) {
+	create<Exec>("pushApk") {
 		group = ANDROID
 		commandLine("adb", "push", "build/javafxports/android/MusicPlayer.apk", "storage/AE58-1072/Programmieren")
 	}
 	
-	"push" {
+	create("push") {
 		doLast {
 			exec { commandLine("adb", "push", "src/layouts/CSS", "storage/AE58-1072/Programmieren/") }
 			exec { commandLine("adb", "push", "src/layouts/FXML", "storage/AE58-1072/Programmieren/") }
@@ -128,7 +120,7 @@ tasks {
 		}
 	}
 	
-	"androidRun" {
+	create("androidRun") {
 		group = ANDROID
 		doLast {
 			exec {
@@ -148,12 +140,12 @@ tasks {
 	
 	tasks.replace("android").dependsOn("androidInstall", "androidRun").group = ANDROID
 	
-	"androidUninstall"(Exec::class) {
+	create<Exec>("androidUninstall") {
 		group = ANDROID
 		commandLine("adb", "shell", "pm", "uninstall", "xerus.music")
 	}
 	
-	"androidReinstall" {
+	create("androidReinstall") {
 		doLast {
 			exec { commandLine("adb", "push", "shell", "pm", "uninstall") }
 			exec { commandLine("gradle", "android") }
@@ -183,14 +175,14 @@ tasks {
 		group = MAIN
 		classifier = ""
 		description = "Assemble a fat Jar"
-		for (set in arrayOf(java.sourceSets["main"], java.sourceSets["desktop"])) {
+		/*for (set in arrayOf(sourceSets.getByName("main"), sourceSets.getByName("desktop"))) {
 			from(set.output)
-		}
+		}*/
 		from(tasks["compileDesktopJava"].outputs)
 		configurations.add(project.configurations["desktopRuntime"])
 	}
 	
-	"release"(Sync::class) {
+	create<Sync>("release") {
 		group = MAIN
 		dependsOn("apk", "jar")
 		val releases = Paths.get(properties["releaseFolder"].toString() + "/MusicPlayer")
