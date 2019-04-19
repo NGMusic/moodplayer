@@ -7,7 +7,7 @@ enum class Settings constructor(private val key: String, defaultValue: Any = "")
 	FOLDERSONTOP("viewFoldersontop", true),
 	LOGLEVEL("loglevel", "FINE"),
 	LIBRARY("library"),
-	ENABLERATINGS("ratingsEnable", isDesktop),
+	ENABLERATINGS("ratingsEnable", false),
 	ENABLERATINGCOLORS("viewRatingcolors", false),
 	VOLUME("volume", 0.9),
 	

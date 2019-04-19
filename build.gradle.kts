@@ -1,15 +1,11 @@
-import com.android.builder.model.AndroidArtifact
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.javafxports.jfxmobile.plugin.android.task.AndroidTask
 import org.javafxports.jfxmobile.plugin.DownConfiguration
 import org.javafxports.jfxmobile.plugin.JFXMobileExtension
 import org.javafxports.jfxmobile.plugin.android.AndroidExtension
 import org.javafxports.jfxmobile.plugin.ios.IosExtension
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 import java.nio.file.Paths
-import kotlin.reflect.KClass
 
 buildscript {
 	repositories {
@@ -21,7 +17,7 @@ plugins {
 	kotlin("jvm") version "1.2.71"
 	application
 	id("com.github.johnrengelman.shadow") version "4.0.1"
-	id("org.javafxports.jfxmobile") version "1.3.15"
+	id("org.javafxports.jfxmobile") version "1.3.16"
 	id("com.github.ben-manes.versions") version "0.20.0"
 }
 
@@ -43,10 +39,10 @@ repositories {
 }
 
 dependencies {
-	compile("com.github.Xerus2000.util", "javafx", "master-SNAPSHOT")
+	compile("com.github.Xerus2000.util", "javafx", "cd7376ec6e33543d81ee07884ec5a3b5827ee008")
 	
 	// Music
-	compile("com.github.ngmusic", "moodplay", "master-SNAPSHOT")
+	compile("com.github.ngmusic", "moodplay", "3a1c3aa2b24136d2c1cd900afe840d21d0131939")
 	compile("net.jthink", "jaudiotagger", "2.2.4")
 	
 	// Logging
@@ -64,7 +60,7 @@ dependencies {
 	androidRuntime("com.gluonhq", "charm-down-android", CHARM_DOWN_VERSION)
 	androidRuntime("org.sqldroid", "sqldroid", "1.0.3")
 	
-	desktopCompile("com.github.Xerus2000.mpris-java", "mpris-extensions", "master-SNAPSHOT")
+	desktopCompile("com.github.ngmusic.mpris-java", "mpris-extensions", "74f51fb6ef2535a55f41b01a0cf160c1ef4e698d")
 	
 	iosRuntime("com.gluonhq", "charm-down-ios", CHARM_DOWN_VERSION)
 	
@@ -114,6 +110,7 @@ tasks {
 	
 	create("push") {
 		doLast {
+			Runtime.getRuntime().exec("adb shell ls /storage")
 			exec { commandLine("adb", "push", "src/layouts/CSS", "storage/AE58-1072/Programmieren/") }
 			exec { commandLine("adb", "push", "src/layouts/FXML", "storage/AE58-1072/Programmieren/") }
 			exec { commandLine("adb", "push", "build/javafxports/android/MusicPlayer.apk", "storage/AE58-1072/Programmieren/") }
@@ -128,8 +125,8 @@ tasks {
 			}
 			exec {
 				commandLine("adb",
-						"shell", "monkey",
-						"-p", "xerus.music", "1")
+					"shell", "monkey",
+					"-p", "xerus.music", "1")
 			}
 			exec {
 				commandLine("adb", "logcat", "-s", "System.out")
@@ -161,13 +158,9 @@ val MAIN = "_main"
 
 tasks {
 	
-	withType<KotlinCompile> {
-		kotlinOptions.jvmTarget = "1.8"
-	}
-	
 	"run"(JavaExec::class) {
 		group = MAIN
-		// gradle run -Dexec.args="FINE save"
+		// gradle run -Dargs="FINE save"
 		args = System.getProperty("exec.args", "").split(" ")
 	}
 	
@@ -197,6 +190,10 @@ tasks {
 				include("MusicPlayer.jar", "MusicPlayer.apk")
 			}
 		}
+	}
+	
+	withType<KotlinCompile> {
+		kotlinOptions.jvmTarget = "1.8"
 	}
 	
 }
